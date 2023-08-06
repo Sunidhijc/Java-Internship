@@ -1,67 +1,97 @@
-import java.util.Random;
+import java.util.Arrays;
 import java.util.Scanner;
 
-    public class NumberGuessingGame {
-        public static void main(String[] args) {
-            int secretNumber, guess;
-            int attempts = 0;
-            int maxAttempts = 5;
-            int points = 0;
-            int gameno = 1;
+public class ReservationSystem {
+    private static final int MAX_RESERVATIONS = 25;
+    private static String[] reservations = new String[MAX_RESERVATIONS];
+    private static int count = 0;
 
-            Random random = new Random();
-            //Assigning First Random Variable.
-            secretNumber = random.nextInt(50) + 1;
-
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("**Welcome to the Number Guessing Game!***");
-            System.out.println("I'm thinking of a number between 1 and 50.");
-            System.out.println();
-            System.out.println("RULES::");
-            System.out.println("1.You Only have 5 Attempts to win.\n2.You will be given 10 points on correct Answer.\n3.You will be given 10 points for each correct Answer.");
-        while(true) {
-            //External Loop for Number of Games To play.
-            while (true) {
-                //Internal Loop for Attempts.
-                System.out.print("Enter your guess: ");
-                guess = scanner.nextInt();
-                attempts++;
-
-                if (guess == secretNumber) {
-                    System.out.println("Congratulations! You guessed the number correctly in " + attempts + " attempts.");
-                    points += 10;
-                    break;
-                } else if (guess < secretNumber) {
-                    System.out.println("Too low! Try again.");
-                } else {
-                    System.out.println("Too high! Try again.");
-                }
-
-                if (attempts == maxAttempts) {
-                    System.out.println("Sorry, you have reached the maximum number of attempts.");
-                    System.out.println("The secret number was: " + secretNumber);
-                    break;
-                }
-            }
-            //Re-Assigning Attempts.
-            attempts = 0;
-            //Assigning Random variable Again After every game.
-            secretNumber = random.nextInt(50) + 1;
-            //Condition for playing game Again or not.
-            System.out.println("Do you wish to continue the Game: (Y or N)");
-            char enter = scanner.next().trim().charAt(0);
-            if(enter == 'Y'){
-                gameno ++;
-                continue;
-            }
-            else{
-                break;
-            }
-        }
-        //Final points after every game.
-            System.out.println("Your Points till game number "+gameno+" :: " +points);
-
-
+    public static void makeReservation(String name) {
+        if (count >= MAX_RESERVATIONS) {
+            System.out.println("Sorry, no more reservations can be made.");
+        } else if (findReservation(name) != -1) {
+            System.out.println("Sorry, the name is already reserved.");
+        } else {
+            reservations[count] = name;
+            count++;
+            System.out.println("Reservation made for " + name);
         }
     }
-    
+
+    public static void cancelReservation(String name) {
+        int index = findReservation(name);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                reservations[i] = reservations[i + 1];
+            }
+            count--;
+            System.out.println("Reservation canceled for " + name);
+        } else {
+            System.out.println("No reservation found for " + name);
+        }
+    }
+
+    public static void displayReservations() {
+        System.out.println("Current Reservations:");
+        if (count == 0) {
+            System.out.println("No reservations found.");
+        } else {
+            for (int i = 0; i < count; i++) {
+                System.out.println(reservations[i]);
+            }
+        }
+    }
+
+    private static int findReservation(String name) {
+        for (int i = 0; i < count; i++) {
+            if (reservations[i].equals(name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        boolean running = true;
+        while (running) {
+            System.out.println("==== Reservation System ====\n====Maximum 25 Reservations can be made====");
+            System.out.println("1. Make a reservation");
+            System.out.println("2. Cancel a reservation");
+            System.out.println("3. Display reservations");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter name for reservation: ");
+                    String name = scanner.nextLine();
+                    makeReservation(name);
+                    break;
+                case 2:
+                    System.out.print("Enter name to cancel reservation: ");
+                    name = scanner.nextLine();
+                    cancelReservation(name);
+                    break;
+                case 3:
+                    displayReservations();
+                    break;
+                case 4:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
+            }
+
+            System.out.println();
+        }
+
+        System.out.println("Reservation system closed.");
+    }
+}
